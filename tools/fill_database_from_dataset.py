@@ -17,7 +17,7 @@ insert_query_skills = """
         VALUES ($1)
         """
 insert_query = """
-            INSERT INTO vacancy_skill (profession_id, skill_id)
+            INSERT INTO vacancy_skill (vacancy_id, skill_id)
             VALUES ($1, $2)
         """
 
@@ -27,10 +27,10 @@ async def fill_bd(path: str, pool) -> None:
     names = list(df['name'])
     skills = list(df['skills'])
     skills_set = set()
-    skills_id = []
+    skills_id = {}
     for skill in skills:
-        skil_list = skill.strip('{}').replace("'", "").split(',')
-        for s in skil_list:
+        skill_list = skill.strip('{}').replace("'", "").split(',')
+        for s in skill_list:
             skills_set.add(s)
 
     async with pool.acquire() as connection:
@@ -43,8 +43,8 @@ async def fill_bd(path: str, pool) -> None:
                     if skill not in skills_id:
                             skills_id[skill] = await connection.fetchval("""SELECT id FROM skill  WHERE name  = $1""", skill)
             for id_, skill in zip(ids, skills):
-               skil_list = skill.strip('{}').replace("'", "").split(',')
-                    for s in skil_list:
+               skill_list = skill.strip('{}').replace("'", "").split(',')
+                    for s in skill_list:
                       await connection.execute(insert_query, profession_id, skill_id[s]) 
 
 
