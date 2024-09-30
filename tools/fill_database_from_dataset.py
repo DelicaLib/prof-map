@@ -16,9 +16,12 @@ insert_query_skills = """
         INSERT INTO skill (name) 
         VALUES ($1)
         """
+insert_query = """
+            INSERT INTO profession_skills (profession_id, skill_id)
+            VALUES ($1, $2)
+        """
 
-
-async def fill_bd(path: str, pool: PostgresPool) -> None:
+async def fill_bd(path: str, pool) -> None:
     df = pd.read_csv(path, encoding='UTF-8')
     ids = list(df['id'])
     names = list(df['name'])
@@ -35,6 +38,12 @@ async def fill_bd(path: str, pool: PostgresPool) -> None:
                 await connection.execute(insert_query_skills, skill)
             for id_, name in zip(ids, names):
                 await connection.execute(insert_query_prof, id_, name)
+            query = """
+            SELECT id FROM skills WHERE skill_name = $1"""
+            for id_, skill in zip(ids, skills_set):
+              skill_id = await connection.fetchval(query, skill)
+              await connection.execute(insert_query, profession_id, skill_id) 
+
 
 
 @click.command()
