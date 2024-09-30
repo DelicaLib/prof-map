@@ -18,7 +18,7 @@ insert_query_skills = """
         """
 
 
-async def fill_bd(path: str, pool) -> None:
+async def fill_bd(path: str, pool: PostgresPool) -> None:
     df = pd.read_csv(path, encoding='UTF-8')
     ids = list(df['id'])
     names = list(df['name'])
