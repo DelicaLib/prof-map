@@ -40,5 +40,6 @@ def parse_raw_settings(raw_settings):
 def parse_config(config_path: str) -> dict:
     with open(config_path, "rb") as toml_file:
         raw_settings = tomllib.load(toml_file)
-    set_env_vars_from_doppler(parse_raw_settings(raw_settings.get("doppler_token")))
+    if raw_settings.get("doppler_token") is not None:
+        set_env_vars_from_doppler(parse_raw_settings(raw_settings["doppler_token"]))
     return parse_raw_settings(raw_settings)
