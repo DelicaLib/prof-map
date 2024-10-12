@@ -30,8 +30,8 @@ file_handler.setFormatter(formatter)
 LOGGER.addHandler(file_handler)
 
 insert_query_prof = """
-        INSERT INTO vacancy (id, name) 
-        VALUES ($1, $2)
+        INSERT INTO vacancy (name) 
+        VALUES ($1)
         """
 insert_query_skills = """
         INSERT INTO skill (name) 
@@ -60,11 +60,9 @@ async def fill_bd(path: str, pool) -> None:
             for i, skill in enumerate(skills_set, 1):
                 await connection.execute(insert_query_skills, skill)
                 LOGGER.info(f"Added {i} of {len(skills_set)} skills")
-            i = 1
-            for id_, name in zip(ids, names):
-                await connection.execute(insert_query_prof, id_, name)
+            for i, name in enumerate(names, 1):
+                await connection.execute(insert_query_prof, name)
                 LOGGER.info(f"Added {i} of {len(names)} professions")
-                i += 1
             for skill in skills_set:
                 if skill not in skills_id:
                     skills_id[skill] = await connection.fetchval("""SELECT id FROM skill  WHERE name  = $1""", skill)
