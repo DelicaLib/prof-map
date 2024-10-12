@@ -30,12 +30,14 @@ file_handler.setFormatter(formatter)
 LOGGER.addHandler(file_handler)
 
 insert_query_prof = """
-        INSERT INTO vacancy (id, name) 
-        VALUES ($1, $2)
+        INSERT INTO vacancy (name) 
+        VALUES ($1)
+        RETURNING id
         """
 insert_query_skills = """
         INSERT INTO skill (name) 
         VALUES ($1)
+        RETURNING id
         """
 insert_query = """
             INSERT INTO vacancy_skill (vacancy_id, skill_id)
@@ -45,7 +47,6 @@ insert_query = """
 
 async def fill_bd(path: str, pool) -> None:
     df = pd.read_csv(path, encoding='UTF-8')
-    ids = list(df['id'])
     names = list(df['name'])
     skills = list(df['skills'])
     skills_set = set()
@@ -58,16 +59,14 @@ async def fill_bd(path: str, pool) -> None:
     async with pool.acquire() as connection:
         async with connection.transaction():
             for i, skill in enumerate(skills_set, 1):
-                await connection.execute(insert_query_skills, skill)
+                skill_id = await connection.fetchval(insert_query_skills, skill)
+                skills_id[skill] = skill_id
                 LOGGER.info(f"Added {i} of {len(skills_set)} skills")
-            i = 1
-            for id_, name in zip(ids, names):
-                await connection.execute(insert_query_prof, id_, name)
+            ids = []
+            for i, name in enumerate(names, 1):
+                profession_id = await connection.fetchval(insert_query_prof, name)
+                ids.append(profession_id)
                 LOGGER.info(f"Added {i} of {len(names)} professions")
-                i += 1
-            for skill in skills_set:
-                if skill not in skills_id:
-                    skills_id[skill] = await connection.fetchval("""SELECT id FROM skill  WHERE name  = $1""", skill)
             i = 1
             for id_, skill in zip(ids, skills):
                 skill_list = skill.strip('{}').replace("'", "").split(',')
