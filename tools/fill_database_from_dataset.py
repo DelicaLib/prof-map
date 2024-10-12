@@ -60,17 +60,21 @@ async def fill_bd(path: str, pool) -> None:
             for i, skill in enumerate(skills_set, 1):
                 await connection.execute(insert_query_skills, skill)
                 LOGGER.info(f"Added {i} of {len(skills_set)} skills")
-            for i, id_, name in enumerate(zip(ids, names), 1):
+            i = 1
+            for id_, name in zip(ids, names):
                 await connection.execute(insert_query_prof, id_, name)
                 LOGGER.info(f"Added {i} of {len(names)} professions")
+                i += 1
             for skill in skills_set:
                 if skill not in skills_id:
                     skills_id[skill] = await connection.fetchval("""SELECT id FROM skill  WHERE name  = $1""", skill)
-            for i, id_, skill in enumerate(zip(ids, skills), 1):
+            i = 1
+            for id_, skill in zip(ids, skills):
                 skill_list = skill.strip('{}').replace("'", "").split(',')
                 for s in skill_list:
                     await connection.execute(insert_query, id_, skills_id[s])
                 LOGGER.info(f"Added {i} of {len(skills)} professions to skill")
+                i += 1
 
 
 @click.command()
