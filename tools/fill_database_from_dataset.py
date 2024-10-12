@@ -1,4 +1,7 @@
 import asyncio
+import logging
+import os
+import shutil
 
 import click
 import pandas as pd
@@ -7,6 +10,24 @@ from dependencies.postgres.pool import PostgresPool
 from dependencies.settings import Settings
 from main import prepare_container
 from utils.parse_config import parse_config
+
+log_directory = os.path.join('..', 'logs')
+log_file = 'fill_database_from_dataset.log'
+
+if os.path.exists(log_directory):
+    shutil.rmtree(log_directory)
+os.makedirs(log_directory)
+log_file_path = os.path.join(log_directory, log_file)
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler(log_file_path)
+file_handler.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+LOGGER.addHandler(file_handler)
 
 insert_query_prof = """
         INSERT INTO vacancy (id, name) 
@@ -20,6 +41,7 @@ insert_query = """
             INSERT INTO vacancy_skill (vacancy_id, skill_id)
             VALUES ($1, $2)
         """
+
 
 async def fill_bd(path: str, pool) -> None:
     df = pd.read_csv(path, encoding='UTF-8')
@@ -35,18 +57,20 @@ async def fill_bd(path: str, pool) -> None:
 
     async with pool.acquire() as connection:
         async with connection.transaction():
-            for skill in skills_set:
+            for i, skill in enumerate(skills_set, 1):
                 await connection.execute(insert_query_skills, skill)
-            for id_, name in zip(ids, names):
+                LOGGER.info(f"Added {i} of {len(skills_set)} skills")
+            for i, id_, name in enumerate(zip(ids, names), 1):
                 await connection.execute(insert_query_prof, id_, name)
+                LOGGER.info(f"Added {i} of {len(names)} professions")
             for skill in skills_set:
-                    if skill not in skills_id:
-                            skills_id[skill] = await connection.fetchval("""SELECT id FROM skill  WHERE name  = $1""", skill)
-            for id_, skill in zip(ids, skills):
-               skill_list = skill.strip('{}').replace("'", "").split(',')
-                    for s in skill_list:
-                      await connection.execute(insert_query, profession_id, skill_id[s]) 
-
+                if skill not in skills_id:
+                    skills_id[skill] = await connection.fetchval("""SELECT id FROM skill  WHERE name  = $1""", skill)
+            for i, id_, skill in enumerate(zip(ids, skills), 1):
+                skill_list = skill.strip('{}').replace("'", "").split(',')
+                for s in skill_list:
+                    await connection.execute(insert_query, id_, skills_id[s])
+                LOGGER.info(f"Added {i} of {len(skills)} professions to skill")
 
 
 @click.command()
