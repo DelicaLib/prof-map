@@ -2,3 +2,4 @@
 .idea
 tools/datasets
 **/__pycache__
+logs
