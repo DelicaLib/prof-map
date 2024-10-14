@@ -2,4 +2,5 @@
 .idea
 tools/datasets
 **/__pycache__
+**/*.csv
 logs
