@@ -4,6 +4,7 @@ from dependency_injector.wiring import Provide, inject
 
 from lifespan import lifespan
 from routers.debug import debug_router
+from routers.language_model import language_model
 
 main_router = APIRouter(prefix="/api/v1")
 
@@ -19,6 +20,8 @@ def create_app() -> FastAPI:
 @inject
 def prepare_app(app: FastAPI = Provide["fastapi_app"]):
     main_router.include_router(debug_router)
+    main_router.include_router(language_model)
+
     app.include_router(main_router)
 
 

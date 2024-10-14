@@ -9,5 +9,10 @@ class PostgresSettings(BaseModel):
     db_name: str
 
 
+class BertSettings(BaseModel):
+    model: str
+
+
 class Settings(BaseModel):
     postgres: PostgresSettings
+    bert: BertSettings

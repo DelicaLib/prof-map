@@ -3,10 +3,10 @@ import asyncio
 import click
 import pandas as pd
 
-from dependencies.postgres.pool import PostgresPool
-from dependencies.settings import Settings
-from main import prepare_container
-from utils.parse_config import parse_config
+from backend.dependencies.postgres.pool import PostgresPool
+from backend.dependencies.settings import Settings
+from backend.main import prepare_container
+from backend.utils.parse_config import parse_config
 
 insert_query_prof = """
         INSERT INTO vacancy (id, name) 
@@ -43,9 +43,9 @@ async def fill_bd(path: str, pool) -> None:
                     if skill not in skills_id:
                             skills_id[skill] = await connection.fetchval("""SELECT id FROM skill  WHERE name  = $1""", skill)
             for id_, skill in zip(ids, skills):
-               skill_list = skill.strip('{}').replace("'", "").split(',')
-                    for s in skill_list:
-                      await connection.execute(insert_query, profession_id, skill_id[s]) 
+                skill_list = skill.strip('{}').replace("'", "").split(',')
+                for s in skill_list:
+                    await connection.execute(insert_query, id_, skills_id[s])
 
 
 

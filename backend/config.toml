@@ -8,3 +8,6 @@ db_port="env:$DB_PORT"
 db_user="env:$DB_USER"
 db_host="env:$DB_HOST"
 db_name="env:$DB_NAME"
+
+[bert]
+model="DeepPavlov/rubert-base-cased"

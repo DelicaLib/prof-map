@@ -3,6 +3,7 @@ from dependency_injector import providers
 from dependency_injector.containers import DeclarativeContainer
 
 from app import create_app
+from applications.bert import BertApplication
 from dependencies.postgres.pool import PostgresPool
 from dependencies.settings import Settings
 
@@ -19,3 +20,5 @@ class Container(DeclarativeContainer):
     db_pool: PostgresPool = providers.Singleton(PostgresPool, settings=settings)
 
     fastapi_app: FastAPI = providers.Singleton(create_app)
+
+    bert_application: BertApplication = providers.Singleton(BertApplication, settings=settings)
