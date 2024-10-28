@@ -5,6 +5,7 @@ from dependency_injector.wiring import Provide, inject
 from lifespan import lifespan
 from routers.debug import debug_router
 from routers.language_model import language_model
+from routers.parser import parser_router
 
 main_router = APIRouter(prefix="/api/v1")
 
@@ -21,10 +22,11 @@ def create_app() -> FastAPI:
 def prepare_app(app: FastAPI = Provide["fastapi_app"]):
     main_router.include_router(debug_router)
     main_router.include_router(language_model)
+    main_router.include_router(parser_router)
 
     app.include_router(main_router)
 
 
 @inject
 def run(app: FastAPI = Provide["fastapi_app"], port: int | None = None):
-    uvicorn.run(app, port=port)
+    uvicorn.run(app, host="0.0.0.0", port=port)

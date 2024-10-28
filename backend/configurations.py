@@ -3,7 +3,9 @@ from dependency_injector import providers
 from dependency_injector.containers import DeclarativeContainer
 
 from app import create_app
+from applications import ServiceApplication, ParserApplication
 from applications.bert import BertApplication
+from dependencies import HHParser
 from dependencies.postgres.pool import PostgresPool
 from dependencies.settings import Settings
 
@@ -21,4 +23,8 @@ class Container(DeclarativeContainer):
 
     fastapi_app: FastAPI = providers.Singleton(create_app)
 
+    hh_parser: HHParser = providers.Singleton(HHParser)
+
+    service_application: ServiceApplication = providers.Singleton(ServiceApplication)
     bert_application: BertApplication = providers.Singleton(BertApplication, settings=settings)
+    parser_application: ParserApplication = providers.Singleton(ParserApplication)
