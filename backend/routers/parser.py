@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from applications import ParserApplication
 from models.parser import HHParserResponse
 
-parser_router = APIRouter(prefix="/parser")
+parser_router = APIRouter(prefix="/parser", tags=["Parser"])
 
 
 @parser_router.get("/hh_vacancy")

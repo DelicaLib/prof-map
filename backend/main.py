@@ -21,6 +21,7 @@ def prepare_container(settings_dict):
         "routers.debug",
         "routers.language_model",
         "routers.parser",
+        "routers.openai",
         "lifespan",
     ])
 

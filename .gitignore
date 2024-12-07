@@ -4,3 +4,5 @@ tools/datasets
 **/__pycache__
 **/*.csv
 logs
+/tools/results2/
+/tools/bert_skills_list/

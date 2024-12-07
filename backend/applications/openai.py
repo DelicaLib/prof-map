@@ -1,9 +1,14 @@
 from dependency_injector.wiring import inject, Provide
 
 from dependencies.openai import OpenAIClient
+from models.openai import OpenAIResponse, RoadMapRequest
 
 
 class OpenAIApplication:
     @inject
-    def get_completion(self, skills: list[str], job: str, client: OpenAIClient = Provide['openai_client']):
-        return client.get_completion(skills, job)
+    async def get_roadmap(
+        self,
+        request: RoadMapRequest,
+        client: OpenAIClient = Provide['openai_client']
+    ) -> OpenAIResponse:
+        return OpenAIResponse(roadmap=await client.get_roadmap(request.skills, request.job))
