@@ -30,5 +30,5 @@ class Container(DeclarativeContainer):
     service_application: ServiceApplication = providers.Singleton(ServiceApplication)
     bert_application: BertApplication = providers.Singleton(BertApplication, settings=settings)
     parser_application: ParserApplication = providers.Singleton(ParserApplication)
-    openai_client: OpenAIClient = providers.Singleton(OpenAIClient)
+    openai_client: OpenAIClient = providers.Singleton(OpenAIClient, settings=settings)
     openai_application: OpenAIApplication = providers.Singleton(OpenAIApplication)

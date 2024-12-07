@@ -1,11 +1,16 @@
 from openai import OpenAI
 
+from dependencies.settings import Settings
+
 
 class OpenAIClient:
-    def __init__(self):
-        self.client = OpenAI()
+    def __init__(self, settings: Settings):
+        self.client = OpenAI(
+            api_key=settings.openai.gpt_token,
+            base_url="https://api.proxyapi.ru/openai/v1"
+        )
 
-    async def get_completion(self, skills: list[str], job: str):
+    async def get_roadmap(self, skills: list[str], job: str) -> dict:
         completion = self.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -19,4 +24,15 @@ class OpenAIClient:
 
             ]
         )
-        return completion.choices[0].message
+        return completion.choices[0].message.dict()
+
+    async def generate_road_map_text(self, text: str) -> dict:
+        completion = self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "user",
+                 "content": f""""""}
+
+            ]
+        )
+        return completion.choices[0].message.dict()

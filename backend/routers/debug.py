@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-debug_router = APIRouter(prefix="/debug")
+debug_router = APIRouter(prefix="/debug", tags=["debug"])
 
 
 @debug_router.get("/ping")

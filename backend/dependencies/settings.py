@@ -11,8 +11,14 @@ class PostgresSettings(BaseModel):
 
 class BertSettings(BaseModel):
     model: str
+    skills_model_path: str
+
+
+class OpenAISettings(BaseModel):
+    gpt_token: str
 
 
 class Settings(BaseModel):
     postgres: PostgresSettings
     bert: BertSettings
+    openai: OpenAISettings

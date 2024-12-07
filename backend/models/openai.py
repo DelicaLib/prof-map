@@ -1,10 +1,14 @@
 from pydantic import BaseModel
 
 
-class OpenAIRequest(BaseModel):
+class RoadMapRequest(BaseModel):
     skills: list[str]
     job: str
 
 
+class LabelSkillsRequest(BaseModel):
+    text: str
+
+
 class OpenAIResponse(BaseModel):
-    roadmap: str
+    roadmap: dict

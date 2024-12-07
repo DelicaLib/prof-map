@@ -11,6 +11,7 @@ db_name="env:$DB_NAME"
 
 [bert]
 model="DeepPavlov/rubert-base-cased"
+skills_model_path="./skills_label_model"
 
-[openaiclient]
+[openai]
 gpt_token="env:$GPT_API_KEY"
