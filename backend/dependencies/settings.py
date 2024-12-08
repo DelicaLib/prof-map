@@ -14,6 +14,10 @@ class BertSettings(BaseModel):
     skills_model_path: str
 
 
+class RobertaSettings(BaseModel):
+    model: str
+
+
 class OpenAISettings(BaseModel):
     gpt_token: str
 
@@ -21,4 +25,5 @@ class OpenAISettings(BaseModel):
 class Settings(BaseModel):
     postgres: PostgresSettings
     bert: BertSettings
+    roberta: RobertaSettings
     openai: OpenAISettings
