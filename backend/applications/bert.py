@@ -3,9 +3,12 @@ import logging
 import torch
 import re
 
+from dependency_injector.wiring import Provide
 from transformers import BertTokenizer, BertModel, AutoModelForTokenClassification, AutoTokenizer
+
+from applications.roberta import RoBertaApplication
 from dependencies.settings import Settings
-from models.language_model import SkillsList
+from models.language_model import SkillsList, ClusteredSkills
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,9 +35,22 @@ class BertApplication:
     async def get_tokenized_text(self, text: str) -> list[str]:
         return self._tokenizer_base.tokenize(text)
 
-    async def get_skills_from_text(self, text: str) -> SkillsList:
-        tokens, predicted_labels = await self._predict_skill_labels(text, {2: 'O', 0: 'B-SKILL', 1: 'I-SKILL'})
-        return SkillsList(skills=list(await self._merge_tokens(tokens, predicted_labels)))
+    async def get_skills_from_text(
+            self,
+            text: str,
+            *,
+            roberta_application: RoBertaApplication = Provide['roberta_application']
+    ) -> SkillsList:
+        tokens, predicted_labels = await self._predict_skill_labels(
+            text,
+            {2: 'O', 0: 'B-SKILL', 1: 'I-SKILL'}
+        )
+        skills = list(await self._merge_tokens(tokens, predicted_labels))
+        clustered_skills = await roberta_application.get_clustered_skills(skills)
+        return SkillsList(
+            skills=skills,
+            clustered=clustered_skills
+        )
 
     async def _predict_skill_labels(self, text: str, id_to_label: dict[int, str]) -> tuple[list[str], list[str]]:
         encoding = self._tokenizer_skills_label(text, return_tensors="pt", padding=True, truncation=True)
