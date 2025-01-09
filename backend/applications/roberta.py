@@ -27,7 +27,7 @@ class RoBertaApplication:
 
         return embeddings.numpy()
 
-    async def _cluster_skills(self, skills: list[str], eps=0.0003, min_samples=1):
+    async def _cluster_skills(self, skills: list[str], eps=0.003, min_samples=1):
         skills = [skill.lower().strip() for skill in skills if len(skill) > 0]
 
         embeddings = await self._generate_skills_embeddings(skills)
@@ -66,6 +66,11 @@ class RoBertaApplication:
         return result_skills_dict
 
     async def get_clustered_skills(self, skills: list[str]) -> ClusteredSkills:
+        if len(skills) == 0:
+            return ClusteredSkills(
+                clustered_skills={},
+                combined_skills=[]
+            )
         result_clusters = await self._cluster_skills(skills)
         result_skills_dict = await self._convert_clustered_skills(result_clusters)
         return ClusteredSkills(

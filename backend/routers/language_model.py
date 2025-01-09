@@ -26,7 +26,7 @@ async def get_skills_from_text(
         *,
         bert_application: BertApplication = Depends(Provide['bert_application'])
 ) -> SkillsList:
-    result = await bert_application.get_skills_from_text(request.text)
+    result = await bert_application.get_clustered_skills_from_text(request.text)
     return result
 
 

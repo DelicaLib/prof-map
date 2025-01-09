@@ -1,4 +1,5 @@
 import logging
+from typing import List, Any
 
 import torch
 import re
@@ -14,6 +15,12 @@ LOGGER = logging.getLogger(__name__)
 
 
 class BertApplication:
+
+    _SPECIAL_CHARACTERS: list[str] = [
+        "!", "@", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=",
+        "{", "}", "[", "]", "|", "\\", ":", ";", "'", "\"", "<", ">", ",", ".",
+        "?", "/", "~", "`", " "
+    ]
 
     def __init__(self, settings: Settings):
         self._model_base_name = settings.bert.model
@@ -35,7 +42,7 @@ class BertApplication:
     async def get_tokenized_text(self, text: str) -> list[str]:
         return self._tokenizer_base.tokenize(text)
 
-    async def get_skills_from_text(
+    async def get_clustered_skills_from_text(
             self,
             text: str,
             *,
@@ -52,6 +59,20 @@ class BertApplication:
             clustered=clustered_skills
         )
 
+    async def get_skills_from_text(
+            self,
+            text: str,
+    ) -> SkillsList:
+        tokens, predicted_labels = await self._predict_skill_labels(
+            text,
+            {2: 'O', 0: 'B-SKILL', 1: 'I-SKILL'}
+        )
+        skills = list(await self._merge_tokens(tokens, predicted_labels))
+        return SkillsList(
+            skills=skills,
+            clustered=None
+        )
+
     async def _predict_skill_labels(self, text: str, id_to_label: dict[int, str]) -> tuple[list[str], list[str]]:
         encoding = self._tokenizer_skills_label(text, return_tensors="pt", padding=True, truncation=True)
 
@@ -65,8 +86,7 @@ class BertApplication:
 
         return tokens, predicted_labels
 
-    @staticmethod
-    async def _merge_tokens(tokens: list[str], labels: list[str]) -> set[str]:
+    async def _merge_tokens(self, tokens: list[str], labels: list[str]) -> set[str]:
         skills: list[str] = []
         current_label = ""
         last_label = ""
@@ -107,4 +127,8 @@ class BertApplication:
                 skills.append(current_word)
                 if current_word.isalnum():
                     skills[-1] += " "
-        return {skill.strip() for skill in skills}
+        return {
+            skill.strip("".join(self._SPECIAL_CHARACTERS))
+            for skill in skills
+            if not (len(skill) == 1 and not skill[0].isalpha())
+        }

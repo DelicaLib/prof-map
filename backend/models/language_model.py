@@ -20,4 +20,4 @@ class SkillsListRequest(BaseModel):
 
 class SkillsList(BaseModel):
     skills: list[str]
-    clustered: ClusteredSkills
+    clustered: ClusteredSkills | None
