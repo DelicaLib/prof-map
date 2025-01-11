@@ -3,7 +3,8 @@ from dependency_injector import providers
 from dependency_injector.containers import DeclarativeContainer
 
 from app import create_app
-from applications import ServiceApplication, ParserApplication, BertApplication, OpenAIApplication, RoBertaApplication
+from applications import ServiceApplication, ParserApplication, BertApplication, OpenAIApplication, RoBertaApplication, \
+    VacancyApplication
 from dependencies import HHParser
 from dependencies.openai import OpenAIClient
 from dependencies.postgres.pool import PostgresPool
@@ -31,3 +32,4 @@ class Container(DeclarativeContainer):
     parser_application: ParserApplication = providers.Singleton(ParserApplication)
     openai_client: OpenAIClient = providers.Singleton(OpenAIClient, settings=settings)
     openai_application: OpenAIApplication = providers.Singleton(OpenAIApplication)
+    vacancy_application: VacancyApplication = providers.Singleton(VacancyApplication)
