@@ -42,7 +42,7 @@ class HHParser:
     async def sub_page_process(url: str) -> HHParserResponse:
         content_bs4 = await get_content(url)
         attributes = {
-            'title': {'tag': 'h1', 'params': {'class': 'bloko-header-section-1', 'data-qa': 'vacancy-title'}},
+            'title': {'tag': 'h1', 'params': {'data-qa': 'title'}},
             'salary': {'tag': 'span', 'params': {
                 'data-qa': 'vacancy-salary-compensation-type-gross'}},
             'experience': {'tag': 'span', 'params': {'data-qa': 'vacancy-experience'}},
@@ -74,7 +74,7 @@ class HHParser:
         with ThreadPoolExecutor(max_workers=min(5, len(data_url_vacancies))) as executor:
             tasks = [
                 loop.run_in_executor(executor, partial(asyncio.run, self.sub_page_process(url)))
-                for url in data_url_vacancies
+                for url in data_url_vacancies if "adsrv.hh.ru" not in url
             ]
 
             await asyncio.gather(*tasks)

@@ -13,5 +13,8 @@ db_name="env:$DB_NAME"
 model="DeepPavlov/rubert-base-cased"
 skills_model_path="./skills_label_model"
 
+[roberta]
+model="FacebookAI/xlm-roberta-large"
+
 [openai]
 gpt_token="env:$GPT_API_KEY"

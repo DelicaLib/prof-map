@@ -7,6 +7,7 @@ from routers.debug import debug_router
 from routers.language_model import language_model
 from routers.openai import openai_router
 from routers.parser import parser_router
+from routers.vacancy import vacancy_router
 
 main_router = APIRouter(prefix="/api/v1")
 
@@ -25,6 +26,7 @@ def prepare_app(app: FastAPI = Provide["fastapi_app"]):
     main_router.include_router(language_model)
     main_router.include_router(parser_router)
     main_router.include_router(openai_router)
+    main_router.include_router(vacancy_router)
 
     app.include_router(main_router)
 
