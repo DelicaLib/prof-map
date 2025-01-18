@@ -11,7 +11,7 @@ db_name="env:$DB_NAME"
 
 [bert]
 model="DeepPavlov/rubert-base-cased"
-skills_model_path="./skills_label_model"
+skills_model_path="Delicalib/ru_skill_labels"
 
 [roberta]
 model="FacebookAI/xlm-roberta-large"
