@@ -8,13 +8,27 @@ from routers.language_model import language_model
 from routers.openai import openai_router
 from routers.parser import parser_router
 
+from fastapi.middleware.cors import CORSMiddleware
+
 main_router = APIRouter(prefix="/api/v1")
+
+origins = [
+    "http://127.0.0.1:5500",  # Ваш фронтенд
+    "http://localhost:5500",  # Альтернативный адрес
+]
 
 
 def create_app() -> FastAPI:
     app = FastAPI(
         title="Road MAP",
         lifespan=lifespan
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,  # Разрешенные источники
+        allow_credentials=True,  # Если нужны cookies
+        allow_methods=["*"],  # Разрешенные методы (GET, POST и т.д.)
+        allow_headers=["*"],  # Разрешенные заголовки
     )
     return app
 
